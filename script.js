@@ -7,6 +7,8 @@ window.onload = function()
     var delay = 100;
     var snakee;
     var applee;
+    var widthInBlocks = canvasWidth/blockSize;
+    var heightInBlocks = canvasHeight/blockSize;
 
     init();
 
@@ -26,11 +28,20 @@ window.onload = function()
 
     function refreshCanvas()
     {
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         snakee.advance();
-        snakee.draw();
-        applee.draw();
-        setTimeout(refreshCanvas, delay);
+
+        if(snakee.checkCollision())
+        {
+            // GAME OVER
+        }
+        else
+        {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            snakee.draw();
+            applee.draw();
+            setTimeout(refreshCanvas, delay);
+        }
+       
     }
 
     function drawBlock(ctx, position)
@@ -98,6 +109,37 @@ window.onload = function()
                 this.direction = newDirection;
             }
           };
+          this.checkCollision = function()
+            {
+                var wallCollision = false;
+                var snakeCollision = false;
+                var head = this.body[0];
+                var rest = this.body.slice(1);
+                var snakeX = head[0];
+                var snakeY = head[1];
+                var minX = 0;
+                var minY = 0;
+                var maxX = widthInBlocks - 1;
+                var maxY = heightInBlocks - 1;
+                var isNotBetweenHorizontalWalls = snakeX < minX || snakeX > maxX;
+                var isNotBetweenVerticalWalls = snakeY < minY || snakeY > maxY;
+
+                if(isNotBetweenHorizontalWalls || isNotBetweenVerticalWalls)
+                {
+                    wallCollision = true;
+                }
+
+                for(var i = 0; i < rest.length ; i++)
+                {
+                    if(snakeX === rest[i][0] && snakeY === rest[i][1] )
+                    {
+                        snakeCollision = true;
+                    }
+                }
+
+                return wallCollision || snakeCollision;
+            };
+          
 
     }
 
